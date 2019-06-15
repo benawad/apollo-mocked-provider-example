@@ -61,7 +61,6 @@ export const TodoForm: React.FC<Props> = () => {
               </div>
               <button
                 disabled={loading}
-                data-testid="submit-button"
                 type="submit"
               >
                 Add Todo
