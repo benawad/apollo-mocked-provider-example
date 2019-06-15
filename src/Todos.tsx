@@ -20,8 +20,8 @@ export const Todos: React.FC<Props> = () => {
         if (loading) return <p>Loading...</p>;
         if (error) return <p>Error :(</p>;
 
-        return data.todos.map(({ id, type }) => {
-          return <p key={id}>{type}</p>;
+        return data.todos.map(({ type }, idx) => {
+          return <p key={idx}>{type}</p>;
         });
       }}
     </Query>

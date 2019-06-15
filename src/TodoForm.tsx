@@ -1,7 +1,7 @@
 import * as React from "react";
 import gql from "graphql-tag";
 import { Mutation } from "react-apollo";
-import { Formik, Field, Form } from "formik";
+import { Formik, Form } from "formik";
 import { GET_TODOS } from "./Todos";
 
 interface Props {}
@@ -20,24 +20,50 @@ export const TodoForm: React.FC<Props> = () => {
     <Mutation
       mutation={ADD_TODO}
       update={(cache, { data: { addTodo } }) => {
-        const { todos } = cache.readQuery({ query: GET_TODOS });
+        let todos = [];
+        try {
+          const data = cache.readQuery({ query: GET_TODOS });
+          todos = data.todos;
+        } catch {}
         cache.writeQuery({
           query: GET_TODOS,
-          data: { todos: todos.concat([addTodo]) }
+          data: { todos: [...todos, addTodo] }
         });
       }}
     >
       {(addTodo, { loading }) => (
         <Formik
           initialValues={{ type: "" }}
+          validate={x => {
+            if (!x.type) {
+              return {
+                type: "required"
+              };
+            }
+            return {};
+          }}
           onSubmit={values => {
             addTodo({ variables: values });
           }}
         >
-          {() => (
+          {({ handleChange, values, errors, touched }) => (
             <Form>
-              <Field name="type" />
-              <button disabled={loading} type="submit">
+              <div>
+                <input
+                  name="type"
+                  placeholder="todo..."
+                  value={values.type}
+                  onChange={handleChange}
+                />
+                {touched.type && errors.type && (
+                  <div style={{ color: "red" }}>{errors.type}</div>
+                )}
+              </div>
+              <button
+                disabled={loading}
+                data-testid="submit-button"
+                type="submit"
+              >
                 Add Todo
               </button>
             </Form>
